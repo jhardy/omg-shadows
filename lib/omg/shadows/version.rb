@@ -1,0 +1,5 @@
+module Omg
+  module Shadows
+    VERSION = "0.0.1"
+  end
+end
