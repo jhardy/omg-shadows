@@ -51,10 +51,7 @@ $omg-default-style: "flat" !default;
             // Darken the shadow text color
             $shadowColor : darken($shadowColor, $i * ($darken-amount/100));
         }
-        @else if $style == "flat" {
-            // Keep same color
-            $shadowColor : $color
-        }
+
         // Update the string that is used to create the text shadow
         $shadow-markup : append($shadow-markup, unquote($omg-direction-markup) + $shadowColor, comma);
     }
