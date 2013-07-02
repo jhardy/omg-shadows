@@ -40,9 +40,10 @@ $omg-default-style: "flat" !default;
     @else if $direction == "top-left"       { $direction: 315; }
     @else                                   { $direction: $direction; }
 
+    $omg-angle: $direction * (pi()/180);
+
     // Loop through all the levels specified
     @for $i from 0 through $levels {
-        $omg-angle: $direction * (pi()/180);
 
         // Calculate the correct angle
         $omg-direction-markup : ($i) * sin($omg-angle)  + "px " + -($i) * cos($omg-angle) + "px 0 ";
