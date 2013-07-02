@@ -1,68 +1,36 @@
-$direction-markup : false
-$omg-angle: 0
+$omg-direction-markup : false !default;
+$omg-angle: 0 !default;
 
 $omg-default-angle: 0 !default;
 $omg-default-levels: 15 !default;
 $omg-default-style: "flat" !default;
 
 
-@mixin omg-box($color, $direction: $omg-default-angle; $levels: $omg-default-levels, $style: $omg-default-style, $darken-amount: 0) {
-
+@mixin omg-box($color, $angle: $omg-default-angle, $levels: $omg-default-levels, $style: $omg-default-style, $darken-amount: 0) {
+    $shadow-markup: omg-shadow-builder($color, $angle, $levels, $style, $darken-amount);
+    box-shadow: $shadow-markup;
 }
 
 
-
-
-@mixin omg-text($color, $direction: 0, $levels: 15 , $style: "flat",  $darken-amount: 0) {
-
+@mixin omg-text($color, $angle: $omg-default-angle, $levels: $omg-default-levels, $style: $omg-default-style, $darken-amount: 0) {
+    $shadow-markup: omg-shadow-builder($color, $angle, $levels, $style, $darken-amount);
+    text-shadow: $shadow-markup;
 }
 
-    $shadowColor : $color
-    $shadow-markup : ""
-    $darken-amount: $darken-amount
+@mixin omg-offset($angle, $color1, $levels1, $color2, $levels2) {
+    $offset-1: omg-shadow-builder($color1, $angle, $levels1, "flat", 0);
+    $offset-2: omg-shadow-builder($color2, $angle, $levels2, "flat", 0);
 
-    // Loop through all the levels specified
-    @for $i from 0 through $levels
-        //for each level apply a text shadow at the correct angle
-        @include omg-text-offset($direction, $i)
-
-        @if $style == "shaded"
-            // Darken the shadow text color
-            $shadowColor : darken($shadowColor, $i * ($darken-amount/100))
-        @else if $style == "flat"
-            // Keep same color
-            $shadowColor : $color
-
-        // Update the string that is used to create the text shadow
-        $shadow-markup : $shadow-markup + $direction-markup + $shadowColor
-        // If you are not on the last level add a comma at the end of the string so you can apply the next text shadow
-        @if $i < $levels
-            $shadow-markup: $shadow-markup + ", "
-
-    // After loop finishes add the text shadow
-    @include text-shadow(unquote($shadow-markup))
-
-
-@mixin omg-offset($angle, $color1, $levels1, $color2, $levels2)
-
-    $shadow-markup : ""
-
-    @include omg-text-offset($angle, $levels1)
-    $shadow-markup: $shadow-markup + $direction-markup + $color1 + ", "
-
-    @include omg-text-offset($angle, $levels2)
-    $shadow-markup: $shadow-markup + $direction-markup + $color2
-
-    @include text-shadow(unquote($shadow-markup))
-
-
-@mixin omg-build-shadows() {
-
+    text-shadow:  append($offset-1, $offset-2);
 }
 
 
-@function omg-calculate-angle($direction, $i) {
-    @if $direction == "top"                 { $direction: 0; }
+@function omg-shadow-builder($color, $direction, $levels, $style, $darken-amount) {
+    $shadowColor : $color;
+    $shadow-markup : ();
+
+    // handle angle key names
+    @if      $direction == "top"            { $direction: 0; }
     @else if $direction == "top-right"      { $direction: 45; }
     @else if $direction == "right"          { $direction: 90; }
     @else if $direction == "bottom-right"   { $direction: 135; }
@@ -70,13 +38,28 @@ $omg-default-style: "flat" !default;
     @else if $direction == "bottom-left"    { $direction: 225; }
     @else if $direction == "left"           { $direction: 270; }
     @else if $direction == "top-left"       { $direction: 315; }
-    @else                                   {$direction: $direction }
+    @else                                   { $direction: $direction; }
 
-    $omg-angle: $direction * (pi()/180);
+    // Loop through all the levels specified
+    @for $i from 0 through $levels {
+        $omg-angle: $direction * (pi()/180);
 
-    // Calculate the correct angle
-    $direction-markup : ($i) * sin($omg-angle)  + "px " + -($i) * cos($omg-angle) + "px 0 ";
+        // Calculate the correct angle
+        $omg-direction-markup : ($i) * sin($omg-angle)  + "px " + -($i) * cos($omg-angle) + "px 0 ";
+
+        @if $style == "shaded" {
+            // Darken the shadow text color
+            $shadowColor : darken($shadowColor, $i * ($darken-amount/100));
+        }
+        @else if $style == "flat" {
+            // Keep same color
+            $shadowColor : $color
+        }
+        // Update the string that is used to create the text shadow
+        $shadow-markup : append($shadow-markup, unquote($omg-direction-markup) + $shadowColor, comma);
+    }
+
+    @return $shadow-markup;
 }
-
 
 
