@@ -17,11 +17,18 @@ $omg-default-style: "flat" !default;
     text-shadow: $shadow-markup;
 }
 
-@mixin omg-offset($angle, $color1, $levels1, $color2, $levels2) {
+@mixin omg-text-offset($angle, $color1, $levels1, $color2, $levels2) {
     $offset-1: omg-shadow-builder($color1, $angle, $levels1, "flat", 0);
     $offset-2: omg-shadow-builder($color2, $angle, $levels2, "flat", 0);
 
     text-shadow:  append($offset-1, $offset-2);
+}
+
+@mixin omg-box-offset($angle, $color1, $levels1, $color2, $levels2) {
+    $offset-1: omg-shadow-builder($color1, $angle, $levels1, "flat", 0);
+    $offset-2: omg-shadow-builder($color2, $angle, $levels2, "flat", 0);
+
+    box-shadow:  append($offset-1, $offset-2);
 }
 
 
