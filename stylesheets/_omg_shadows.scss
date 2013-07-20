@@ -4,13 +4,21 @@ $omg-default-levels: 15 !default;
 
 @mixin omg-box($color, $angle: $omg-default-angle, $levels: $omg-default-levels, $darken-amount: 0) {
     $shadow-markup: omg-shadow-builder($color, $angle, $levels, $darken-amount);
+
     box-shadow: $shadow-markup;
 }
 
-
 @mixin omg-text($color, $angle: $omg-default-angle, $levels: $omg-default-levels, $darken-amount: 0) {
     $shadow-markup: omg-shadow-builder($color, $angle, $levels, $darken-amount);
+
     text-shadow: $shadow-markup;
+}
+
+@mixin omg-box-offset($angle, $color1, $levels1, $color2, $levels2) {
+    $offset-1: omg-shadow-builder($color1, $angle, $levels1, 0);
+    $offset-2: omg-shadow-builder($color2, $angle, $levels2, 0);
+
+    box-shadow:  append($offset-1, $offset-2);
 }
 
 @mixin omg-text-offset($angle, $color1, $levels1, $color2, $levels2) {
@@ -20,12 +28,6 @@ $omg-default-levels: 15 !default;
     text-shadow:  append($offset-1, $offset-2);
 }
 
-@mixin omg-box-offset($angle, $color1, $levels1, $color2, $levels2) {
-    $offset-1: omg-shadow-builder($color1, $angle, $levels1, 0);
-    $offset-2: omg-shadow-builder($color2, $angle, $levels2, 0);
-
-    box-shadow:  append($offset-1, $offset-2);
-}
 
 
 @function omg-shadow-builder($color, $angle, $levels, $darken-amount) {
@@ -43,7 +45,7 @@ $omg-default-levels: 15 !default;
     @else if $angle == "bottom-left"    { $angle: 225; }
     @else if $angle == "left"           { $angle: 270; }
     @else if $angle == "top-left"       { $angle: 315; }
-    @else                                   { $angle: $angle; }
+    @else                               { $angle: $angle; }
 
     $angle: $angle * (pi()/180);
 
@@ -53,6 +55,7 @@ $omg-default-levels: 15 !default;
         // Calculate the correct angle
         $direction-markup : ($i) * sin($angle)  + "px " + -($i) * cos($angle) + "px 0 ";
 
+        // If more than one color passed, blend color based on position in for loop
         @if length($color) > 1 {
             $mix-percentage: 100% - ($i * (100%/$levels));
             $shadowColor: mix(nth($color, 1), nth($color, 2), $mix-percentage);
@@ -69,3 +72,65 @@ $omg-default-levels: 15 !default;
 
     @return $shadow-markup;
 }
+
+
+// Test Stuff that is not working because my brain is slow today
+// @function omg-shadow-builder($color, $angle, $levels, $darken-amount) {
+
+//     $shadowColor        : $color;
+//     $shadow-markup      : ();
+//     $direction-markup   : "";
+//     $numbers-of-colors  : length($color);
+//     $color-iterator     : 0;
+//     $color-steps        : floor($levels / $numbers-of-colors - 1);
+
+
+
+
+//     // handle angle key names
+//     @if      $angle == "top"            { $angle: 0; }
+//     @else if $angle == "top-right"      { $angle: 45; }
+//     @else if $angle == "right"          { $angle: 90; }
+//     @else if $angle == "bottom-right"   { $angle: 135; }
+//     @else if $angle == "bottom"         { $angle: 180; }
+//     @else if $angle == "bottom-left"    { $angle: 225; }
+//     @else if $angle == "left"           { $angle: 270; }
+//     @else if $angle == "top-left"       { $angle: 315; }
+//     @else                               { $angle: $angle; }
+
+//     $angle: $angle * (pi()/180);
+
+//     // Loop through all the levels specified
+//     @for $i from 0 through $levels {
+
+//         // Calculate the correct angle
+//         $direction-markup : ($i) * sin($angle)  + "px " + -($i) * cos($angle) + "px 0 ";
+
+//         @if $numbers-of-colors > 1 {
+
+//             @if ($i % $color-steps == 0) and ($i < (($levels - $color-steps) - ($numbers-of-colors + 2))){
+//                 $color-iterator : $color-iterator + 1;
+//             }
+
+
+//             $mix-percentage: (100%  - ($i * (100%/$levels)));
+
+//             @debug "test " +  100% / $numbers-of-colors;
+
+//             //@debug "Color iterator: #{$color-iterator}, Mix percentage: #{$mix-percentage}";
+//             $shadowColor: mix(nth($color, $color-iterator), nth($color, ($color-iterator + 1)), $mix-percentage);
+//         }
+
+//         @else if $darken-amount > 0 {
+//             // Darken the shadow text color
+//             $shadowColor : darken($shadowColor, $i * ($darken-amount/100));
+//         }
+
+//         // Update the string that is used to create the text shadow
+//         $shadow-markup : append($shadow-markup, unquote($direction-markup) + $shadowColor, comma);
+//     }
+
+//     @return $shadow-markup;
+// }
+
+
